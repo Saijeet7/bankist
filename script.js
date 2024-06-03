@@ -77,33 +77,30 @@ const displayMovements = (movements) => {
   });
 };
 
-displayMovements(account1.movements);
-
 const calcDisplayBalance = (movements) => {
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
   labelBalance.textContent = `${balance} €`;
 };
 calcDisplayBalance(account1.movements);
 
-const calcDisplaySummary = (movements) => {
-  const incomes = movements
+const calcDisplaySummary = (acc) => {
+  const incomes = acc.movements
     .filter((mov) => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
   labelSumIn.textContent = `{${incomes}€}`;
 
-  const out = movements
+  const out = acc.movements
     .filter((mov) => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
   labelSumOut.textContent = `{${Math.abs(out)}€}`;
 
-  const interest = movements
+  const interest = acc.movements
     .filter((mov) => mov > 0)
-    .map((deposit) => (deposit * 1.2) / 100)
+    .map((deposit) => (deposit * acc.interestRate) / 100)
     .filter((int) => int >= 1)
     .reduce((acc, int) => acc + int, 0);
   labelSumInterest.textContent = `${interest}€`;
 };
-calcDisplaySummary(account1.movements);
 
 const createUserName = (accs) => {
   accs.forEach((acc) => {
@@ -114,8 +111,48 @@ const createUserName = (accs) => {
       .join("");
   });
 };
-console.log(accounts);
 createUserName(accounts);
+
+// Event Handler
+let currentAccount;
+btnLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+  console.log("Login successful");
+  currentAccount = accounts.find(
+    (acc) => acc.username === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // display UI and message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(" ")[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    // clear the input fields
+    inputLoginUsername.value = inputLoginPin.value = "";
+    inputLoginPin.blur();
+
+    // Display movements
+    displayMovements(currentAccount.movements);
+
+    // Display Balance
+    calcDisplayBalance(currentAccount.movements);
+
+    // display summary
+    calcDisplaySummary(currentAccount);
+  }
+});
+
+btnTransfer.addEventListener("click", (e) => {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    (acc) => acc.username === inputTransferTo.value
+  );
+  console.log(amount, receiverAcc);
+});
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -235,22 +272,29 @@ TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
 GOOD LUCK 😀
 */
 
-const calcAverageHumanAge = (ages) => {
-  const average = ages
-    .map((age) => (age <= 2 ? age * 2 : age * 4 + 16))
-    .filter((age) => age >= 18)
-    .reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-  console.log(average);
-};
+// const calcAverageHumanAge = (ages) => {
+//   const average = ages
+//     .map((age) => (age <= 2 ? age * 2 : age * 4 + 16))
+//     .filter((age) => age >= 18)
+//     .reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+//   console.log(average);
+// };
 
-calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]);
-calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]);
+// calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]);
+// calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+// const eurToUsd = 1.1;
+// const totalDepositUsd = movements
+//   .filter((mov) => mov > 0)
+//   .map((mov) => mov * eurToUsd)
+//   .reduce((acc, cur) => acc + cur, 0);
+// console.log(totalDepositUsd);
 
-const eurToUsd = 1.1;
-const totalDepositUsd = movements
-  .filter((mov) => mov > 0)
-  .map((mov) => mov * eurToUsd)
-  .reduce((acc, cur) => acc + cur, 0);
-console.log(totalDepositUsd);
+// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+// const firstWithdrawal = movements.find((mov) => mov < 0);
+// console.log(firstWithdrawal);
+
+// console.log(accounts);
+// const account = accounts.find((acc) => acc.owner === "Jessica Davis");
+// console.log(account);
