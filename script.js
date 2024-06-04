@@ -123,11 +123,10 @@ const updateUi = (acc) => {
   calcDisplaySummary(acc);
 };
 
-// Event Handler
+// Event Handlers
 let currentAccount;
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
-  console.log("Login successful");
   currentAccount = accounts.find(
     (acc) => acc.username === inputLoginUsername.value
   );
@@ -165,6 +164,27 @@ btnTransfer.addEventListener("click", (e) => {
     receiverAcc.movements.push(amount);
     updateUi(currentAccount);
   }
+});
+
+btnClose.addEventListener("click", (e) => {
+  e.preventDefault();
+  // clear the input fields
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      (acc) => acc.username === currentAccount.username
+    );
+    console.log(index);
+
+    // delete the account
+    accounts.splice(index, 1);
+
+    // hide ui
+    containerApp.style.opacity = 0;
+  }
+  inputCloseUsername.value = inputClosePin.value = "";
 });
 
 /////////////////////////////////////////////////
