@@ -73,16 +73,24 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
-const displayMovements = (movements, sort = false) => {
+const displayMovements = (acc, sort = false) => {
   containerMovements.innerHTML = "";
-  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movs = sort
+    ? acc.movements.slice().sort((a, b) => a - b)
+    : acc.movements;
   movs.forEach((mov, i) => {
     const type = mov > 0 ? "deposit" : "withdrawal";
+    const date = new Date(acc.movementsDates[i]);
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear();
+    const displayDate = `${day}/${month}/${year}`;
     const html = `
     <div class="movements__row">
       <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
+    <div class="movements__date">${displayDate}</div>
       <div class="movements__value">${mov.toFixed(2)}€</div>
     </div>
     `;
@@ -127,7 +135,7 @@ createUserName(accounts);
 
 const updateUi = (acc) => {
   // Display movements
-  displayMovements(acc.movements);
+  displayMovements(acc);
 
   // Display Balance
   calcDisplayBalance(acc);
@@ -138,6 +146,12 @@ const updateUi = (acc) => {
 
 // Event Handlers
 let currentAccount;
+
+// Fake Always logged in
+currentAccount = account1;
+updateUi(currentAccount);
+containerApp.style.opacity = 100;
+
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
   currentAccount = accounts.find(
@@ -151,6 +165,14 @@ btnLogin.addEventListener("click", (e) => {
       currentAccount.owner.split(" ")[0]
     }`;
     containerApp.style.opacity = 100;
+
+    const now = new Date();
+    const day = `${now.getDate()}`.padStart(2, 0);
+    const month = `${now.getMonth() + 1}`.padStart(2, 0);
+    const year = now.getFullYear();
+    const hour = `$now.getHours()}`.padStart(2, 0);
+    const min = `${now.getMinutes()}`.padStart(2, 0);
+    labelDate.textContent = `${day}/${month}/${year}, ${hour}: ${min}`;
 
     // clear the input fields
     inputLoginUsername.value = inputLoginPin.value = "";
@@ -175,6 +197,10 @@ btnTransfer.addEventListener("click", (e) => {
   ) {
     currentAccount.movements.push(-amount);
     receiverAcc.movements.push(amount);
+
+    // Add transfer date
+    currentAccount.movementsDates.push(new Date().toISOString());
+    receiverAcc.movementsDates.push(new Date().toISOString());
     updateUi(currentAccount);
   }
 });
@@ -189,6 +215,10 @@ btnLoan.addEventListener("click", (e) => {
   ) {
     // Add movement
     currentAccount.movements.push(amount);
+
+    // Add transfer date
+    currentAccount.movementsDates.push(new Date().toISOString());
+
     // Update UI
     updateUi(currentAccount);
     inputLoanAmount.value = "";
@@ -227,43 +257,69 @@ btnSort.addEventListener("click", (e) => {
 // LECTURES
 
 // conversion strings to numbers
-console.log(Number("23"));
-console.log(+"23");
+// console.log(Number("23"));
+// console.log(+"23");
 
-// Parsing
-console.log(Number.parseInt("30px", 10));
-console.log(Number.parseFloat("2.530rem"));
+// // Parsing
+// console.log(Number.parseInt("30px", 10));
+// console.log(Number.parseFloat("2.530rem"));
 
-// Check Value is NaN
-console.log(Number.isNaN("20"));
-console.log(Number.isNaN(+"20X"));
-console.log(Number.isNaN(23 / 0));
+// // Check Value is NaN
+// console.log(Number.isNaN("20"));
+// console.log(Number.isNaN(+"20X"));
+// console.log(Number.isNaN(23 / 0));
 
-// Check Value is number
-console.log(Number.isFinite("20"));
-console.log(Number.isFinite(+"20X"));
-console.log(Number.isFinite(23));
+// // Check Value is number
+// console.log(Number.isFinite("20"));
+// console.log(Number.isFinite(+"20X"));
+// console.log(Number.isFinite(23));
 
-const randomInt = (min, max) =>
-  Math.trunc(Math.random() * (max - min) + 1) + min;
+// const randomInt = (min, max) =>
+//   Math.trunc(Math.random() * (max - min) + 1) + min;
 
-console.log(randomInt(10, 20));
+// console.log(randomInt(10, 20));
 
-// //////////////////////////////////////////////////////////////////
-console.log(Math.sqrt(25));
-console.log(25 ** (1 / 2));
-console.log(8 ** (1 / 3));
-console.log(Math.max(5, 12, 123, 11, 2));
+// // //////////////////////////////////////////////////////////////////
+// console.log(Math.sqrt(25));
+// console.log(25 ** (1 / 2));
+// console.log(8 ** (1 / 3));
+// console.log(Math.max(5, 12, 123, 11, 2));
 
-console.log(Math.trunc(Math.random() * 6) + 1);
+// console.log(Math.trunc(Math.random() * 6) + 1);
 
-const diameter = 12_312_313_212;
-console.log(diameter);
-const priceCents = 345_99;
-console.log(priceCents);
+// const diameter = 12_312_313_212;
+// console.log(diameter);
+// const priceCents = 345_99;
+// console.log(priceCents);
 
-console.log(2 ** 53 - 1);
+// console.log(2 ** 53 - 1);
 
-console.log(23123123123219312309123901230919203123);
-console.log(23123123123219312309123901230919203123n);
-console.log(BigInt(23123123123));
+// console.log(23123123123219312309123901230919203123);
+// console.log(23123123123219312309123901230919203123n);
+// console.log(BigInt(23123123123));
+
+// create date
+// const now = new Date();
+// console.log(now);
+
+// console.log(new Date("Aug 02 2020 18:05:41"));
+// console.log(new Date("December 24, 2015"));
+// console.log(new Date(account1.movementsDates[0]));
+
+// console.log(new Date(2037, 10, 19, 15, 24, 5));
+// console.log(new Date(2037, 10, 33));
+// console.log(new Date(0));
+// console.log(new Date(3 * 24 * 60 * 60 * 1000));
+
+// // Working with dates
+// const future = new Date(2037, 10, 19, 15, 24);
+// console.log(future);
+// console.log(future.getFullYear());
+// console.log(future.getMonth());
+// console.log(future.getDate());
+// console.log(future.getDay());
+// console.log(future.getHours());
+// console.log(future.getMinutes());
+// console.log(future.getSeconds());
+// console.log(future.toISOString());
+// console.log(Date.now());
