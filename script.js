@@ -165,13 +165,27 @@ const updateUi = (acc) => {
   calcDisplaySummary(acc);
 };
 
-// Event Handlers
-let currentAccount;
+const startLogoutTimer = () => {
+  const tick = () => {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(Math.trunc(time % 60)).padStart(2, 0);
+    labelTimer.textContent = `${min} : ${sec}`;
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = "Log in to get started";
+      containerApp.style.opacity = 0;
+    }
+    time--;
+  };
+  let time = 35;
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
 
-// Fake Always logged in
-currentAccount = account1;
-updateUi(currentAccount);
-containerApp.style.opacity = 100;
+//////////////////////////////
+// Event Handlers
+let currentAccount, timer;
 
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
@@ -205,6 +219,8 @@ btnLogin.addEventListener("click", (e) => {
     // clear the input fields
     inputLoginUsername.value = inputLoginPin.value = "";
     inputLoginPin.blur();
+    if (timer) clearInterval(timer);
+    timer = startLogoutTimer();
 
     updateUi(currentAccount);
   }
@@ -230,6 +246,10 @@ btnTransfer.addEventListener("click", (e) => {
     currentAccount.movementsDates.push(new Date().toISOString());
     receiverAcc.movementsDates.push(new Date().toISOString());
     updateUi(currentAccount);
+
+    // Reset timer
+    clearInterval(timer);
+    timer = startLogoutTimer();
   }
 });
 
@@ -241,16 +261,22 @@ btnLoan.addEventListener("click", (e) => {
     amount > 0 &&
     currentAccount.movements.some((mov) => mov >= amount * 0.1)
   ) {
-    // Add movement
-    currentAccount.movements.push(amount);
+    setTimeout(function () {
+      // Add movement
+      currentAccount.movements.push(amount);
 
-    // Add transfer date
-    currentAccount.movementsDates.push(new Date().toISOString());
+      // Add transfer date
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    // Update UI
-    updateUi(currentAccount);
+      // Update UI
+      updateUi(currentAccount);
+    }, 2500);
     inputLoanAmount.value = "";
   }
+
+  // Reset timer
+  clearInterval(timer);
+  timer = startLogoutTimer();
 });
 
 btnClose.addEventListener("click", (e) => {
@@ -352,16 +378,33 @@ btnSort.addEventListener("click", (e) => {
 // console.log(future.toISOString());
 // console.log(Date.now());
 
-const num = 3884764.23;
+// const num = 3884764.23;
 
-const options = {
-  style: "currency",
-  unit: "mile-per-hour",
-  currency: "EUR",
-};
-console.log("Us  : ", new Intl.NumberFormat("en-US", options).format(num));
-console.log("Germany  : ", new Intl.NumberFormat("de-DE", options).format(num));
-console.log(
-  "navigator  : ",
-  new Intl.NumberFormat(navigator.language, options).format(num)
-);
+// const options = {
+//   style: "currency",
+//   unit: "mile-per-hour",
+//   currency: "EUR",
+// };
+// console.log("Us  : ", new Intl.NumberFormat("en-US", options).format(num));
+// console.log("Germany  : ", new Intl.NumberFormat("de-DE", options).format(num));
+// console.log(
+//   "navigator  : ",
+//   new Intl.NumberFormat(navigator.language, options).format(num)
+// );
+
+// Set timeout
+// const ingredients = ["olives", "spinach"];
+// const pizzaTimer = setTimeout(
+//   (ing1, ing2) => console.log(`Here is your pizza ${ing1} and ${ing2}`),
+//   3000,
+//   ...ingredients
+// );
+// console.log("Waiting");
+
+// if (ingredients.includes("spinach")) clearTimeout(pizzaTimer);
+
+// // setTimeout
+// setInterval(function () {
+//   const now = new Date();
+//   console.log(now);
+// }, 1000);
